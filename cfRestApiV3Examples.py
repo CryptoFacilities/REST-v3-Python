@@ -25,11 +25,11 @@ import datetime
 apiPath = "https://www.cryptofacilities.com/derivatives"
 apiPublicKey = "..."  # accessible on your Account page under Settings -> API Keys
 apiPrivateKey = "..."  # accessible on your Account page under Settings -> API Keys
-timeout = 10
+timeout = 20
 checkCertificate = True  # when using the test environment, this must be set to "False"
 
 cfPublic = cfApi.cfApiMethods(apiPath, timeout=timeout, checkCertificate=checkCertificate)
-cfPrivate = cfApi.cfApiMethods(apiPath, apiPublicKey=apiPublicKey, apiPrivateKey=apiPrivateKey, \
+cfPrivate = cfApi.cfApiMethods(apiPath, timeout=timeout, apiPublicKey=apiPublicKey, apiPrivateKey=apiPrivateKey, \
                                checkCertificate=checkCertificate)
 
 
@@ -146,4 +146,4 @@ def APITester():
     result = cfPrivate.get_transfers(lastTransferTime=lastTransferTime)
     print("get_transfers:\n", result)
 
-
+APITester()
