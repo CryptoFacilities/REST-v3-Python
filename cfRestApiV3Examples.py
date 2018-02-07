@@ -45,12 +45,12 @@ def APITester():
     print("get_tickers:\n", result)
 
     # get order book
-    symbol = "f-xbt:usd-sep16"
+    symbol = "FI_XBTUSD_180316"
     result = cfPublic.get_orderbook(symbol)
     print("get_orderbook:\n", result)
 
     # get history
-    symbol = "f-xbt:usd-sep16"  # "f-xbt:usd-sep16", "cf-bpi", "cf-hbpi"
+    symbol = "FI_XBTUSD_180316"  # "FI_XBTUSD_180316", "cf-bpi", "cf-hbpi"
     lastTime = datetime.datetime.strptime("2016-01-20", "%Y-%m-%d").isoformat() + ".000Z"
     result = cfPublic.get_history(symbol, lastTime=lastTime)
     print("get_history:\n", result)
@@ -63,7 +63,7 @@ def APITester():
 
     # send limit order
     orderType = "lmt"
-    symbol = "f-xbt:usd-sep16"
+    symbol = "FI_XBTUSD_180316"
     side = "buy"
     size = 1
     limitPrice = 1.00
@@ -72,7 +72,7 @@ def APITester():
 
     # send stop order
     orderType = "stp"
-    symbol = "f-xbt:usd-sep16"
+    symbol = "FI_XBTUSD_180316"
     side = "buy"
     size = 1
     limitPrice = 1.00
@@ -93,7 +93,7 @@ def APITester():
                     "order": "send",
                     "order_tag": "1",
                     "orderType": "lmt",
-                    "symbol": "f-xbt:usd-sep16",
+                    "symbol": "FI_XBTUSD_180316",
                     "side": "buy",
                     "size": 1,
                     "limitPrice": 1.00,
@@ -102,7 +102,7 @@ def APITester():
                     "order": "send",
                     "order_tag": "2",
                     "orderType": "stp",
-                    "symbol": "f-xbt:usd-sep16",
+                    "symbol": "FI_XBTUSD_180316",
                     "side": "buy",
                     "size": 1,
                     "limitPrice": 2.00,
