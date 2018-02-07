@@ -1,6 +1,6 @@
 # Crypto Facilities Ltd REST API v3
 
-# Copyright (c) 2016 Crypto Facilities
+# Copyright (c) 2018 Crypto Facilities
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the "Software"),
