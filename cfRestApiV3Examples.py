@@ -45,12 +45,12 @@ def APITester():
     print("get_tickers:\n", result)
 
     # get order book
-    symbol = "FI_XBTUSD_180316"
+    symbol = "FI_XBTUSD_180615"
     result = cfPublic.get_orderbook(symbol)
     print("get_orderbook:\n", result)
 
     # get history
-    symbol = "FI_XBTUSD_180316"  # "FI_XBTUSD_180316", "cf-bpi", "cf-hbpi"
+    symbol = "FI_XBTUSD_180615"  # "FI_XBTUSD_180615", "cf-bpi", "cf-hbpi"
     lastTime = datetime.datetime.strptime("2016-01-20", "%Y-%m-%d").isoformat() + ".000Z"
     result = cfPublic.get_history(symbol, lastTime=lastTime)
     print("get_history:\n", result)
@@ -63,16 +63,26 @@ def APITester():
 
     # send limit order
     orderType = "lmt"
-    symbol = "FI_XBTUSD_180316"
+    symbol = "FI_XBTUSD_180615"
     side = "buy"
     size = 1
     limitPrice = 1.00
     result = cfPrivate.send_order(orderType, symbol, side, size, limitPrice)
     print("send_order (limit):\n", result)
 
+    # send limit order with client id
+    orderType = "lmt"
+    symbol = "FI_XBTUSD_180519"
+    side = "buy"
+    size = 1
+    limitPrice = 1.00
+    clientId = "my_client_id"
+    result = cfPrivate.send_order(orderType, symbol, side, size, limitPrice,clientOrderId=clientId)
+    print("send_order (limit) with client id:\n", result)
+
     # send stop order
     orderType = "stp"
-    symbol = "FI_XBTUSD_180316"
+    symbol = "FI_XBTUSD_180615"
     side = "buy"
     size = 1
     limitPrice = 1.00
@@ -93,16 +103,17 @@ def APITester():
                     "order": "send",
                     "order_tag": "1",
                     "orderType": "lmt",
-                    "symbol": "FI_XBTUSD_180316",
+                    "symbol": "FI_XBTUSD_180519",
                     "side": "buy",
                     "size": 1,
                     "limitPrice": 1.00,
+                    "cliOrdId": "my_another_client_id"
                 },
                 {
                     "order": "send",
                     "order_tag": "2",
                     "orderType": "stp",
-                    "symbol": "FI_XBTUSD_180316",
+                    "symbol": "FI_XBTUSD_180615",
                     "side": "buy",
                     "size": 1,
                     "limitPrice": 2.00,
@@ -114,7 +125,7 @@ def APITester():
                 },
                 {
                     "order": "cancel",
-                    "order_id": "ce927332-87ba-4611-9bd7-ce38af84afdb",
+                    "cliOrdId": "my_client_id",
                 },
             ],
     }
