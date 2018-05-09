@@ -79,20 +79,27 @@ class cfApiMethods(object):
         return self.make_request("GET", endpoint)
 
     # places an order
-    def send_order(self, orderType, symbol, side, size, limitPrice, stopPrice=""):
+    def send_order(self, orderType, symbol, side, size, limitPrice, stopPrice=None, clientOrderId=None):
         endpoint = "/api/v3/sendorder"
-        if orderType == "lmt":
-            postBody = "orderType=%s&symbol=%s&side=%s&size=%s&limitPrice=%s" % (
-                orderType, symbol, side, size, limitPrice)
-        if orderType == "stp":
-            postBody = "orderType=%s&symbol=%s&side=%s&size=%s&limitPrice=%s&stopPrice=%s" % \
-                       (orderType, symbol, side, size, limitPrice, stopPrice)
+        postBody = "orderType=%s&symbol=%s&side=%s&size=%s&limitPrice=%s" % (orderType, symbol, side, size, limitPrice)
+
+        if orderType == "stp" and stopPrice is not None:
+            postBody += "&stopPrice=%s" % stopPrice
+
+        if clientOrderId is not None:
+            postBody += "&cliOrdId=%s" % clientOrderId
+
         return self.make_request("POST", endpoint, postBody=postBody)
 
     # cancels an order
-    def cancel_order(self, order_id):
+    def cancel_order(self, order_id=None, cli_ord_id=None):
         endpoint = "/api/v3/cancelorder"
-        postBody = "order_id=%s" % order_id
+
+        if order_id is None:
+            postBody = "cliOrdId=%s" % cli_ord_id
+        else:
+            postBody = "order_id=%s" % order_id
+
         return self.make_request("POST", endpoint, postBody=postBody)
 
         # places or cancels orders in batch
