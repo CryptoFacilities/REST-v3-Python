@@ -95,6 +95,11 @@ def APITester():
     result = cfPrivate.cancel_order(order_id)
     print("cancel_order:\n", result)
 
+    # cancel all orders after a minute
+    timeout_in_seconds = 60
+    result = cfPrivate.cancel_all_orders_after(timeout_in_seconds)
+    print("cancel_order:\n", result)
+
     # batch order
     jsonElement = {
         "batchOrder":

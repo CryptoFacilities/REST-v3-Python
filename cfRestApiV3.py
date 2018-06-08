@@ -102,8 +102,14 @@ class cfApiMethods(object):
 
         return self.make_request("POST", endpoint, postBody=postBody)
 
-        # places or cancels orders in batch
+    # cancel all orders after
+    def cancel_all_orders_after(selfs, timeoutInSeconds=60):
+        endpoint = "/api/v3/cancelallordersafter"
+        postbody = "timeout=%s" % timeoutInSeconds
 
+        return selfs.make_request("POST", endpoint, postBody=postbody)
+
+    # places or cancels orders in batch
     def send_batchorder(self, jsonElement):
         endpoint = "/api/v3/batchorder"
         postBody = "json=%s" % jsonElement
