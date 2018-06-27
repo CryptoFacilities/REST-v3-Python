@@ -103,6 +103,16 @@ class cfApiMethods(object):
         return self.make_request("POST", endpoint, postBody=postBody)
 
     # cancel all orders after
+    def cancel_all_orders(selfs, tradeable=None):
+        endpoint = "/api/v3/cancelallorders"
+        if tradeable is not None:
+            postbody = "symbol=%s" % tradeable
+        else:
+            postbody = ""
+
+        return selfs.make_request("POST", endpoint, postBody=postbody)
+
+    # cancel all orders after
     def cancel_all_orders_after(selfs, timeoutInSeconds=60):
         endpoint = "/api/v3/cancelallordersafter"
         postbody = "timeout=%s" % timeoutInSeconds
@@ -148,6 +158,11 @@ class cfApiMethods(object):
         else:
             postUrl = ""
         return self.make_request("GET", endpoint, postUrl=postUrl)
+
+    # returns all notifications
+    def get_notifications(self):
+        endpoint = "/api/v3/notifications"
+        return self.make_request("GET", endpoint)
 
     # signs a message
     def sign_message(self, endpoint, nonce, postData):
