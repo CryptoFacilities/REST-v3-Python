@@ -103,10 +103,14 @@ class cfApiMethods(object):
         return self.make_request("POST", endpoint, postBody=postBody)
 
     # cancel all orders after
-    def cancel_all_orders(selfs, tradeable=None):
+    def cancel_all_orders(selfs, symbol=None, accountSymbol=None):
         endpoint = "/api/v3/cancelallorders"
-        if tradeable is not None:
-            postbody = "symbol=%s" % tradeable
+        if symbol is not None:
+            postbody = "symbol=%s" % symbol
+
+        elif accountSymbol is not None:
+            postbody = "accountSymbol=%s" % accountSymbol
+
         else:
             postbody = ""
 
