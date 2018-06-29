@@ -102,6 +102,24 @@ class cfApiMethods(object):
 
         return self.make_request("POST", endpoint, postBody=postBody)
 
+    # cancel all orders (NOTICE specify symbol OR accountSymbol NOT both)
+    def cancel_all_orders(selfs, symbol=None, accountSymbol=None):
+        endpoint = "/api/v3/cancelallorders"
+        if symbol is not None and accountSymbol is None:
+            postbody = "symbol=%s" % symbol
+
+        elif accountSymbol is not None and symbol is None:
+            postbody = "accountSymbol=%s" % accountSymbol
+
+        elif symbol is None and accountSymbol is None:
+            postbody = ""
+
+        else:
+            raise ValueError("Specify only one method parameter!")
+
+        return selfs.make_request("POST", endpoint, postBody=postbody)
+
+
     # cancel all orders after
     def cancel_all_orders_after(selfs, timeoutInSeconds=60):
         endpoint = "/api/v3/cancelallordersafter"
@@ -148,6 +166,11 @@ class cfApiMethods(object):
         else:
             postUrl = ""
         return self.make_request("GET", endpoint, postUrl=postUrl)
+
+    # returns all notifications
+    def get_notifications(self):
+        endpoint = "/api/v3/notifications"
+        return self.make_request("GET", endpoint)
 
     # signs a message
     def sign_message(self, endpoint, nonce, postData):
