@@ -102,7 +102,7 @@ class cfApiMethods(object):
 
         return self.make_request("POST", endpoint, postBody=postBody)
 
-    # cancel all orders (NOTICE specify symbol OR accountSymbol NOT both)
+    # cancel all orders
     def cancel_all_orders(selfs, symbol=None):
         endpoint = "/api/v3/cancelallorders"
         if symbol is not None:
