@@ -103,19 +103,12 @@ class cfApiMethods(object):
         return self.make_request("POST", endpoint, postBody=postBody)
 
     # cancel all orders (NOTICE specify symbol OR accountSymbol NOT both)
-    def cancel_all_orders(selfs, symbol=None, accountSymbol=None):
+    def cancel_all_orders(selfs, symbol=None):
         endpoint = "/api/v3/cancelallorders"
-        if symbol is not None and accountSymbol is None:
+        if symbol is not None:
             postbody = "symbol=%s" % symbol
-
-        elif accountSymbol is not None and symbol is None:
-            postbody = "accountSymbol=%s" % accountSymbol
-
-        elif symbol is None and accountSymbol is None:
-            postbody = ""
-
         else:
-            raise ValueError("Specify only one method parameter!")
+            postbody = ""
 
         return selfs.make_request("POST", endpoint, postBody=postbody)
 
