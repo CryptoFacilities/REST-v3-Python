@@ -95,6 +95,10 @@ def APITester():
     result = cfPrivate.cancel_order(order_id)
     print("cancel_order:\n", result)
 
+    # cancel all orders of margin account
+    result = cfPrivate.cancel_all_orders(symbol="fi_xrpusd")
+    print("cancel_all_orders:\n", result)
+
     # cancel all orders after a minute
     timeout_in_seconds = 60
     result = cfPrivate.cancel_all_orders_after(timeout_in_seconds)
