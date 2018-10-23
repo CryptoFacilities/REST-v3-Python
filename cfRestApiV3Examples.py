@@ -36,7 +36,7 @@ cfPrivate = cfApi.cfApiMethods(apiPath, timeout=timeout, apiPublicKey=apiPublicK
 def APITester():
     ##### public endpoints #####  
 
-    # get instruments    
+    # get instruments
     result = cfPublic.get_instruments()
     print("get_instruments:\n", result)
 
@@ -57,7 +57,7 @@ def APITester():
 
     ##### private endpoints #####
 
-    # get account  
+    # get account
     result = cfPrivate.get_accounts()
     print("get_accounts:\n", result)
 
@@ -145,7 +145,7 @@ def APITester():
     result = cfPrivate.get_openorders()
     print("get_openorders:\n", result)
 
-    # get fills  
+    # get fills
     lastFillTime = datetime.datetime.strptime("2016-02-01", "%Y-%m-%d").isoformat() + ".000Z"
     result = cfPrivate.get_fills(lastFillTime=lastFillTime)
     print("get_fills:\n", result)
@@ -161,9 +161,17 @@ def APITester():
     result = cfPrivate.send_withdrawal(targetAddress, currency, amount)
     print("send_withdrawal:\n", result)
 
-    # get xbt transfers    
+    # get xbt transfers
     lastTransferTime = datetime.datetime.strptime("2016-02-01", "%Y-%m-%d").isoformat() + ".000Z"
     result = cfPrivate.get_transfers(lastTransferTime=lastTransferTime)
     print("get_transfers:\n", result)
+
+    # transfer
+    fromAccount = "fi_ethusd"
+    toAccount = "cash"
+    unit = "eth"
+    amount = 0.1
+    result = cfPrivate.transfer(fromAccount, toAccount, unit, amount)
+    print("transfer:\n", result)
 
 APITester()

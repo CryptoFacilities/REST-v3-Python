@@ -165,6 +165,12 @@ class cfApiMethods(object):
         endpoint = "/api/v3/notifications"
         return self.make_request("GET", endpoint)
 
+    # makes an internal transfer
+    def transfer(self, fromAccount, toAccount, unit, amount):
+        endpoint = "/api/v3/transfer"
+        postBody = "fromAccount=%s&toAccount=%s&unit=%s&amount=%s" % (fromAccount, toAccount, unit, amount)
+        return self.make_request("POST", endpoint, postBody=postBody)
+
     # signs a message
     def sign_message(self, endpoint, nonce, postData):
         # step 1: concatenate postData, nonce + endpoint                
