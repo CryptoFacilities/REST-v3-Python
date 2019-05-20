@@ -145,6 +145,14 @@ class cfApiMethods(object):
         endpoint = "/api/v3/openpositions"
         return self.make_request("GET", endpoint)
 
+    def get_recentorders(self, symbol=""):
+        endpoint = "/api/v3/recentorders"
+        if symbol != "":
+            postUrl = "symbol=%s" % symbol
+        else:
+            postUrl = ""
+        return self.make_request("GET", endpoint, postUrl=postUrl)
+
     # sends an xbt withdrawal request
     def send_withdrawal(self, targetAddress, currency, amount):
         endpoint = "/api/v3/withdrawal"

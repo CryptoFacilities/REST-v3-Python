@@ -154,6 +154,12 @@ def APITester():
     result = cfPrivate.get_openpositions()
     print("get_openpositions:\n", result)
 
+
+    # get recentorders
+    symbol = "pi_xbtusd"
+    result = cfPrivate.get_recentorders(symbol)
+    print("get_recentorders:\n", result)
+
     # send xbt withdrawal request
     targetAddress = "xxxxxxxxxx"
     currency = "xbt"
