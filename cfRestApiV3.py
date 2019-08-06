@@ -91,6 +91,24 @@ class cfApiMethods(object):
 
         return self.make_request("POST", endpoint, postBody=postBody)
 
+    # amends an order
+    def edit_order(self, size, limitPrice, orderId=None, clientOrderId=None, stopPrice=None):
+        assert orderId is not None or clientOrderId is not None, "Must specify at least one of orderId or clientOrderId"
+        endpoint = "/api/v3/editorder"
+        postBody = "size=%s&limitPrice=%s" % (size, limitPrice)
+
+        if orderId is not None:
+            postBody += "&orderId=%s" % orderId
+
+        if stopPrice is not None:
+            postBody += "&stopPrice=%s" % stopPrice
+
+        if clientOrderId is not None:
+            postBody += "&cliOrdId=%s" % clientOrderId
+
+        return self.make_request("POST", endpoint, postBody=postBody)
+
+
     # cancels an order
     def cancel_order(self, order_id=None, cli_ord_id=None):
         endpoint = "/api/v3/cancelorder"
