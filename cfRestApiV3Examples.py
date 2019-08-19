@@ -27,10 +27,10 @@ apiPublicKey = "..."  # accessible on your Account page under Settings -> API Ke
 apiPrivateKey = "..."  # accessible on your Account page under Settings -> API Keys
 timeout = 20
 checkCertificate = True  # when using the test environment, this must be set to "False"
+useNonce = False  # nonce is optional
 
 cfPublic = cfApi.cfApiMethods(apiPath, timeout=timeout, checkCertificate=checkCertificate)
-cfPrivate = cfApi.cfApiMethods(apiPath, timeout=timeout, apiPublicKey=apiPublicKey, apiPrivateKey=apiPrivateKey, \
-                               checkCertificate=checkCertificate)
+cfPrivate = cfApi.cfApiMethods(apiPath, timeout=timeout, apiPublicKey=apiPublicKey, apiPrivateKey=apiPrivateKey, checkCertificate=checkCertificate, useNonce=useNonce)
 
 
 def APITester():
@@ -45,12 +45,12 @@ def APITester():
     print("get_tickers:\n", result)
 
     # get order book
-    symbol = "FI_XBTUSD_180615"
+    symbol = "PI_XBTUSD"
     result = cfPublic.get_orderbook(symbol)
     print("get_orderbook:\n", result)
 
     # get history
-    symbol = "FI_XBTUSD_180615"  # "FI_XBTUSD_180615", "cf-bpi", "cf-hbpi"
+    symbol = "PI_XBTUSD"  # "PI_XBTUSD", "cf-bpi", "cf-hbpi"
     lastTime = datetime.datetime.strptime("2016-01-20", "%Y-%m-%d").isoformat() + ".000Z"
     result = cfPublic.get_history(symbol, lastTime=lastTime)
     print("get_history:\n", result)
@@ -62,47 +62,52 @@ def APITester():
     print("get_accounts:\n", result)
 
     # send limit order
-    orderType = "lmt"
-    symbol = "FI_XBTUSD_180615"
-    side = "buy"
-    size = 1
-    limitPrice = 1.00
-    result = cfPrivate.send_order(orderType, symbol, side, size, limitPrice)
+    limit_order = {
+        "orderType": "lmt",
+        "symbol": "PI_XBTUSD",
+        "side": "buy",
+        "size": 1,
+        "limitPrice": 1.00,
+        "reduceOnly": "true"
+    }
+    result = cfPrivate.send_order_1(limit_order)
     print("send_order (limit):\n", result)
 
-    # send limit order with client id
-    orderType = "lmt"
-    symbol = "FI_XBTUSD_180519"
-    side = "buy"
-    size = 1
-    limitPrice = 1.00
-    clientId = "my_client_id"
-    result = cfPrivate.send_order(orderType, symbol, side, size, limitPrice,clientOrderId=clientId)
-    print("send_order (limit) with client id:\n", result)
-
-    # send stop order
-    orderType = "stp"
-    symbol = "FI_XBTUSD_180615"
-    side = "buy"
-    size = 1
-    limitPrice = 1.00
-    stopPrice = 2.00
-    result = cfPrivate.send_order(orderType, symbol, side, size, limitPrice, stopPrice=stopPrice)
+    # send stop reduce-only order
+    stop_order = {
+        "orderType": "stp",
+        "symbol": "PI_XBTUSD",
+        "side": "buy",
+        "size": 1,
+        "limitPrice": 1.00,
+        "stopPrice": 2.00,
+        "cliOrdId": "my_stop_client_id"
+    }
+    result = cfPrivate.send_order_1(stop_order)
     print("send_order (stop):\n", result)
+
+    edit = {
+         "cliOrdId": "my_stop_client_id",
+         "size": 2,
+         "limitPrice": 1.50,
+         "stopPrice": 2.50,
+    }
+    result = cfPrivate.edit_order(edit)
+    print("edit_order (stop):\n", result)
 
     # cancel order
     order_id = "e35d61dd-8a30-4d5f-a574-b5593ef0c050"
     result = cfPrivate.cancel_order(order_id)
     print("cancel_order:\n", result)
 
-    # cancel all orders of margin account
-    result = cfPrivate.cancel_all_orders(symbol="fi_xrpusd")
+    # cancel all orders of a margin account
+    result = cfPrivate.cancel_all_orders(symbol="fi_xbtusd")
     print("cancel_all_orders:\n", result)
 
     # cancel all orders after a minute
     timeout_in_seconds = 60
     result = cfPrivate.cancel_all_orders_after(timeout_in_seconds)
-    print("cancel_order:\n", result)
+    print("cancel_all_orders_after:\n", result)
 
     # batch order
     jsonElement = {
@@ -112,7 +117,7 @@ def APITester():
                     "order": "send",
                     "order_tag": "1",
                     "orderType": "lmt",
-                    "symbol": "FI_XBTUSD_180519",
+                    "symbol": "PI_XBTUSD",
                     "side": "buy",
                     "size": 1,
                     "limitPrice": 1.00,
@@ -122,7 +127,7 @@ def APITester():
                     "order": "send",
                     "order_tag": "2",
                     "orderType": "stp",
-                    "symbol": "FI_XBTUSD_180615",
+                    "symbol": "PI_XBTUSD",
                     "side": "buy",
                     "size": 1,
                     "limitPrice": 2.00,
@@ -179,5 +184,6 @@ def APITester():
     amount = 0.1
     result = cfPrivate.transfer(fromAccount, toAccount, unit, amount)
     print("transfer:\n", result)
+
 
 APITester()

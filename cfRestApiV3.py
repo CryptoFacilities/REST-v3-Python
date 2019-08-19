@@ -25,17 +25,19 @@ import hashlib
 import hmac
 import json
 import urllib.request as urllib2
+import urllib.parse as urllib
 import ssl
 
 
 class cfApiMethods(object):
-    def __init__(self, apiPath, apiPublicKey="", apiPrivateKey="", timeout=10, checkCertificate=True):
+    def __init__(self, apiPath, apiPublicKey="", apiPrivateKey="", timeout=10, checkCertificate=True, useNonce=False):
         self.apiPath = apiPath
         self.apiPublicKey = apiPublicKey
         self.apiPrivateKey = apiPrivateKey
         self.timeout = timeout
         self.nonce = 0
         self.checkCertificate = checkCertificate
+        self.useNonce = useNonce
 
     ##### public endpoints #####
 
@@ -91,6 +93,18 @@ class cfApiMethods(object):
 
         return self.make_request("POST", endpoint, postBody=postBody)
 
+    # places an order
+    def send_order_1(self, order):
+        endpoint = "/api/v3/sendorder"
+        postBody = urllib.urlencode(order)
+        return self.make_request("POST", endpoint, postBody=postBody)
+
+    # edit an order
+    def edit_order(self, edit):
+        endpoint = "/api/v3/editorder"
+        postBody = urllib.urlencode(edit)
+        return self.make_request("POST", endpoint, postBody=postBody)
+
     # cancels an order
     def cancel_order(self, order_id=None, cli_ord_id=None):
         endpoint = "/api/v3/cancelorder"
@@ -111,7 +125,6 @@ class cfApiMethods(object):
             postbody = ""
 
         return selfs.make_request("POST", endpoint, postBody=postbody)
-
 
     # cancel all orders after
     def cancel_all_orders_after(selfs, timeoutInSeconds=60):
@@ -145,6 +158,7 @@ class cfApiMethods(object):
         endpoint = "/api/v3/openpositions"
         return self.make_request("GET", endpoint)
 
+    # return the user recent orders
     def get_recentorders(self, symbol=""):
         endpoint = "/api/v3/recentorders"
         if symbol != "":
@@ -180,7 +194,7 @@ class cfApiMethods(object):
         return self.make_request("POST", endpoint, postBody=postBody)
 
     # signs a message
-    def sign_message(self, endpoint, nonce, postData):
+    def sign_message(self, endpoint, postData, nonce=""):
         # step 1: concatenate postData, nonce + endpoint                
         message = postData + nonce + endpoint
 
@@ -200,16 +214,22 @@ class cfApiMethods(object):
 
     # creates a unique nonce
     def get_nonce(self):
-        self.nonce += 1
+        # https://en.wikipedia.org/wiki/Modulo_operation
+        self.nonce = (self.nonce + 1) & 8191
         return str(int(time.time() * 1000)) + str(self.nonce).zfill(4)
 
     # sends an HTTP request
     def make_request(self, requestType, endpoint, postUrl="", postBody=""):
         # create authentication headers
-        nonce = self.get_nonce()
         postData = postUrl + postBody
-        signature = self.sign_message(endpoint, nonce, postData)
-        authentHeaders = {"APIKey": self.apiPublicKey, "Nonce": nonce, "Authent": signature}
+
+        if self.useNonce:
+            nonce = self.get_nonce()
+            signature = self.sign_message(endpoint, postData, nonce=nonce)
+            authentHeaders = {"APIKey": self.apiPublicKey, "Nonce": nonce, "Authent": signature}
+        else:
+            signature = self.sign_message(endpoint, postData)
+            authentHeaders = {"APIKey": self.apiPublicKey, "Authent": signature}
 
         # create request
         url = self.apiPath + endpoint + "?" + postUrl
@@ -228,4 +248,4 @@ class cfApiMethods(object):
         response = response.read().decode("utf-8")
 
         # return
-        return json.loads(response)
+        return response
