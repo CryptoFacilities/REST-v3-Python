@@ -43,23 +43,23 @@ class cfApiMethods(object):
 
     # returns all instruments with specifications
     def get_instruments(self):
-        endpoint = "/api/v3/instruments"
+        endpoint = "/derivatives/api/v3/instruments"
         return self.make_request("GET", endpoint)
 
     # returns market data for all instruments
     def get_tickers(self):
-        endpoint = "/api/v3/tickers"
+        endpoint = "/derivatives/api/v3/tickers"
         return self.make_request("GET", endpoint)
 
     # returns the entire order book of a futures
     def get_orderbook(self, symbol):
-        endpoint = "/api/v3/orderbook"
+        endpoint = "/derivatives/api/v3/orderbook"
         postUrl = "symbol=%s" % symbol
         return self.make_request("GET", endpoint, postUrl=postUrl)
 
     # returns historical data for futures and indices
     def get_history(self, symbol, lastTime=""):
-        endpoint = "/api/v3/history"
+        endpoint = "/derivatives/api/v3/history"
         if lastTime != "":
             postUrl = "symbol=%s&lastTime=%s" % (symbol, lastTime)
         else:
@@ -72,18 +72,19 @@ class cfApiMethods(object):
     # Deprecated because it returns info about the Futures margin account
     # Use get_accounts instead
     def get_account(self):
-        endpoint = "/api/v3/account"
+        endpoint = "/derivatives/api/v3/account"
         return self.make_request("GET", endpoint)
 
     # returns key account information
     def get_accounts(self):
-        endpoint = "/api/v3/accounts"
+        endpoint = "/derivatives/api/v3/accounts"
         return self.make_request("GET", endpoint)
 
     # places an order
     def send_order(self, orderType, symbol, side, size, limitPrice, stopPrice=None, clientOrderId=None):
-        endpoint = "/api/v3/sendorder"
-        postBody = "orderType=%s&symbol=%s&side=%s&size=%s&limitPrice=%s" % (orderType, symbol, side, size, limitPrice)
+        endpoint = "/derivatives/api/v3/sendorder"
+        postBody = "orderType=%s&symbol=%s&side=%s&size=%s&limitPrice=%s" % (
+            orderType, symbol, side, size, limitPrice)
 
         if orderType == "stp" and stopPrice is not None:
             postBody += "&stopPrice=%s" % stopPrice
@@ -95,19 +96,19 @@ class cfApiMethods(object):
 
     # places an order
     def send_order_1(self, order):
-        endpoint = "/api/v3/sendorder"
+        endpoint = "/derivatives/api/v3/sendorder"
         postBody = urllib.urlencode(order)
         return self.make_request("POST", endpoint, postBody=postBody)
 
     # edit an order
     def edit_order(self, edit):
-        endpoint = "/api/v3/editorder"
+        endpoint = "/derivatives/api/v3/editorder"
         postBody = urllib.urlencode(edit)
         return self.make_request("POST", endpoint, postBody=postBody)
 
     # cancels an order
     def cancel_order(self, order_id=None, cli_ord_id=None):
-        endpoint = "/api/v3/cancelorder"
+        endpoint = "/derivatives/api/v3/cancelorder"
 
         if order_id is None:
             postBody = "cliOrdId=%s" % cli_ord_id
@@ -117,36 +118,36 @@ class cfApiMethods(object):
         return self.make_request("POST", endpoint, postBody=postBody)
 
     # cancel all orders
-    def cancel_all_orders(selfs, symbol=None):
-        endpoint = "/api/v3/cancelallorders"
+    def cancel_all_orders(self, symbol=None):
+        endpoint = "/derivatives/api/v3/cancelallorders"
         if symbol is not None:
             postbody = "symbol=%s" % symbol
         else:
             postbody = ""
 
-        return selfs.make_request("POST", endpoint, postBody=postbody)
+        return self.make_request("POST", endpoint, postBody=postbody)
 
     # cancel all orders after
-    def cancel_all_orders_after(selfs, timeoutInSeconds=60):
-        endpoint = "/api/v3/cancelallordersafter"
+    def cancel_all_orders_after(self, timeoutInSeconds=60):
+        endpoint = "/derivatives/api/v3/cancelallordersafter"
         postbody = "timeout=%s" % timeoutInSeconds
 
-        return selfs.make_request("POST", endpoint, postBody=postbody)
+        return self.make_request("POST", endpoint, postBody=postbody)
 
     # places or cancels orders in batch
     def send_batchorder(self, jsonElement):
-        endpoint = "/api/v3/batchorder"
+        endpoint = "/derivatives/api/v3/batchorder"
         postBody = "json=%s" % jsonElement
         return self.make_request("POST", endpoint, postBody=postBody)
 
     # returns all open orders
     def get_openorders(self):
-        endpoint = "/api/v3/openorders"
+        endpoint = "/derivatives/api/v3/openorders"
         return self.make_request("GET", endpoint)
 
     # returns filled orders
     def get_fills(self, lastFillTime=""):
-        endpoint = "/api/v3/fills"
+        endpoint = "/derivatives/api/v3/fills"
         if lastFillTime != "":
             postUrl = "lastFillTime=%s" % lastFillTime
         else:
@@ -155,12 +156,12 @@ class cfApiMethods(object):
 
     # returns all open positions
     def get_openpositions(self):
-        endpoint = "/api/v3/openpositions"
+        endpoint = "/derivatives/api/v3/openpositions"
         return self.make_request("GET", endpoint)
 
     # return the user recent orders
     def get_recentorders(self, symbol=""):
-        endpoint = "/api/v3/recentorders"
+        endpoint = "/derivatives/api/v3/recentorders"
         if symbol != "":
             postUrl = "symbol=%s" % symbol
         else:
@@ -169,13 +170,14 @@ class cfApiMethods(object):
 
     # sends an xbt withdrawal request
     def send_withdrawal(self, targetAddress, currency, amount):
-        endpoint = "/api/v3/withdrawal"
-        postBody = "targetAddress=%s&currency=%s&amount=%s" % (targetAddress, currency, amount)
+        endpoint = "/derivatives/api/v3/withdrawal"
+        postBody = "targetAddress=%s&currency=%s&amount=%s" % (
+            targetAddress, currency, amount)
         return self.make_request("POST", endpoint, postBody=postBody)
 
     # returns xbt transfers
     def get_transfers(self, lastTransferTime=""):
-        endpoint = "/api/v3/transfers"
+        endpoint = "/derivatives/api/v3/transfers"
         if lastTransferTime != "":
             postUrl = "lastTransferTime=%s" % lastTransferTime
         else:
@@ -184,18 +186,27 @@ class cfApiMethods(object):
 
     # returns all notifications
     def get_notifications(self):
-        endpoint = "/api/v3/notifications"
+        endpoint = "/derivatives/api/v3/notifications"
         return self.make_request("GET", endpoint)
 
     # makes an internal transfer
     def transfer(self, fromAccount, toAccount, unit, amount):
-        endpoint = "/api/v3/transfer"
-        postBody = "fromAccount=%s&toAccount=%s&unit=%s&amount=%s" % (fromAccount, toAccount, unit, amount)
+        endpoint = "/derivatives/api/v3/transfer"
+        postBody = "fromAccount=%s&toAccount=%s&unit=%s&amount=%s" % (
+            fromAccount, toAccount, unit, amount)
         return self.make_request("POST", endpoint, postBody=postBody)
+
+    # accountlog csv
+    def get_accountlog(self):
+        endpoint = "/api/history/v2/accountlogcsv"
+        return self.make_request("GET", endpoint)
 
     # signs a message
     def sign_message(self, endpoint, postData, nonce=""):
-        # step 1: concatenate postData, nonce + endpoint                
+        if endpoint.startswith('/derivatives'):
+            endpoint = endpoint[len('/derivatives'):]
+
+        # step 1: concatenate postData, nonce + endpoint
         message = postData + nonce + endpoint
 
         # step 2: hash the result of step 1 with SHA256
@@ -207,7 +218,8 @@ class cfApiMethods(object):
         secretDecoded = base64.b64decode(self.apiPrivateKey)
 
         # step 4: use result of step 3 to has the result of step 2 with HMAC-SHA512
-        hmac_digest = hmac.new(secretDecoded, hash_digest, hashlib.sha512).digest()
+        hmac_digest = hmac.new(secretDecoded, hash_digest,
+                               hashlib.sha512).digest()
 
         # step 5: base64 encode the result of step 4 and return
         return base64.b64encode(hmac_digest)
@@ -226,10 +238,14 @@ class cfApiMethods(object):
         if self.useNonce:
             nonce = self.get_nonce()
             signature = self.sign_message(endpoint, postData, nonce=nonce)
-            authentHeaders = {"APIKey": self.apiPublicKey, "Nonce": nonce, "Authent": signature}
+            authentHeaders = {"APIKey": self.apiPublicKey,
+                              "Nonce": nonce, "Authent": signature}
         else:
             signature = self.sign_message(endpoint, postData)
-            authentHeaders = {"APIKey": self.apiPublicKey, "Authent": signature}
+            authentHeaders = {
+                "APIKey": self.apiPublicKey, "Authent": signature}
+
+        authentHeaders["User-Agent"] = "cf-api-python/1.0"
 
         # create request
         url = self.apiPath + endpoint + "?" + postUrl
@@ -243,7 +259,8 @@ class cfApiMethods(object):
             ctx = ssl.create_default_context()
             ctx.check_hostname = False
             ctx.verify_mode = ssl.CERT_NONE
-            response = urllib2.urlopen(request, context=ctx, timeout=self.timeout)
+            response = urllib2.urlopen(
+                request, context=ctx, timeout=self.timeout)
 
         response = response.read().decode("utf-8")
 

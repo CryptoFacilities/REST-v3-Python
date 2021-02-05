@@ -22,19 +22,25 @@
 import cfRestApiV3 as cfApi
 import datetime
 
-apiPath = "https://www.cryptofacilities.com/derivatives"
-apiPublicKey = "..."  # accessible on your Account page under Settings -> API Keys
-apiPrivateKey = "..."  # accessible on your Account page under Settings -> API Keys
+# accessible on your Account page under Settings -> API Keys
+apiPublicKey = "..."
+# accessible on your Account page under Settings -> API Keys
+apiPrivateKey = "..."
+
+# use "api.cryptofacilities.com" if your IP is whitelisted (Settings -> API Keys -> IP Whitelist)
+apiPath = "https://www.cryptofacilities.com"
 timeout = 20
 checkCertificate = True  # when using the test environment, this must be set to "False"
 useNonce = False  # nonce is optional
 
-cfPublic = cfApi.cfApiMethods(apiPath, timeout=timeout, checkCertificate=checkCertificate)
-cfPrivate = cfApi.cfApiMethods(apiPath, timeout=timeout, apiPublicKey=apiPublicKey, apiPrivateKey=apiPrivateKey, checkCertificate=checkCertificate, useNonce=useNonce)
+cfPublic = cfApi.cfApiMethods(
+    apiPath, timeout=timeout, checkCertificate=checkCertificate)
+cfPrivate = cfApi.cfApiMethods(apiPath, timeout=timeout, apiPublicKey=apiPublicKey,
+                               apiPrivateKey=apiPrivateKey, checkCertificate=checkCertificate, useNonce=useNonce)
 
 
 def APITester():
-    ##### public endpoints #####  
+    ##### public endpoints #####
 
     # get instruments
     result = cfPublic.get_instruments()
@@ -51,7 +57,8 @@ def APITester():
 
     # get history
     symbol = "PI_XBTUSD"  # "PI_XBTUSD", "cf-bpi", "cf-hbpi"
-    lastTime = datetime.datetime.strptime("2016-01-20", "%Y-%m-%d").isoformat() + ".000Z"
+    lastTime = datetime.datetime.strptime(
+        "2016-01-20", "%Y-%m-%d").isoformat() + ".000Z"
     result = cfPublic.get_history(symbol, lastTime=lastTime)
     print("get_history:\n", result)
 
@@ -87,10 +94,10 @@ def APITester():
     print("send_order (stop):\n", result)
 
     edit = {
-         "cliOrdId": "my_stop_client_id",
-         "size": 2,
-         "limitPrice": 1.50,
-         "stopPrice": 2.50,
+        "cliOrdId": "my_stop_client_id",
+        "size": 2,
+        "limitPrice": 1.50,
+        "stopPrice": 2.50,
     }
     result = cfPrivate.edit_order(edit)
     print("edit_order (stop):\n", result)
@@ -146,19 +153,19 @@ def APITester():
     result = cfPrivate.send_batchorder(jsonElement)
     print("send_batchorder:\n", result)
 
-    ## get open orders
+    # get open orders
     result = cfPrivate.get_openorders()
     print("get_openorders:\n", result)
 
     # get fills
-    lastFillTime = datetime.datetime.strptime("2016-02-01", "%Y-%m-%d").isoformat() + ".000Z"
+    lastFillTime = datetime.datetime.strptime(
+        "2016-02-01", "%Y-%m-%d").isoformat() + ".000Z"
     result = cfPrivate.get_fills(lastFillTime=lastFillTime)
     print("get_fills:\n", result)
 
     # get open positions
     result = cfPrivate.get_openpositions()
     print("get_openpositions:\n", result)
-
 
     # get recentorders
     symbol = "pi_xbtusd"
@@ -173,7 +180,8 @@ def APITester():
     print("send_withdrawal:\n", result)
 
     # get xbt transfers
-    lastTransferTime = datetime.datetime.strptime("2016-02-01", "%Y-%m-%d").isoformat() + ".000Z"
+    lastTransferTime = datetime.datetime.strptime(
+        "2016-02-01", "%Y-%m-%d").isoformat() + ".000Z"
     result = cfPrivate.get_transfers(lastTransferTime=lastTransferTime)
     print("get_transfers:\n", result)
 
