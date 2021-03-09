@@ -192,8 +192,8 @@ class cfApiMethods(object):
         endpoint = "/api/history/v2/accountlogcsv"
         return self.make_request("GET", endpoint)
 
-    def _get_partial_historical_orders(self, since=None, contToken=None):
-        endpoint = "/api/history/v2/orders"
+    def _get_partial_historical_elements(self, elementType, since=None, contToken=None):
+        endpoint = "/api/history/v2/%s" % elementType
 
         if contToken is not None:
             return self.make_request_raw("GET", endpoint, postUrl="continuationToken=%s" % contToken)
@@ -203,15 +203,14 @@ class cfApiMethods(object):
 
         return self.make_request_raw("GET", endpoint)
 
-    # historical orders after a certain point in reverse chronological order
-    def get_historical_orders(self, since=None):
+    def _get_historical_elements(self, elementType, since=None):
         elements = []
 
         more = True
         contToken = None
 
         while more:
-            res = self._get_partial_historical_orders(since, contToken)
+            res = self._get_partial_historical_elements(elementType, since, contToken)
             body = json.loads(res.read().decode('utf-8'))
             elements = elements + body['elements']
 
@@ -224,9 +223,21 @@ class cfApiMethods(object):
         elements.sort(key=lambda el: el['timestamp'], reverse=True)
         return elements
 
+    # historical orders after a certain point in reverse chronological order
+    def get_historical_orders(self, since=None):
+        return self._get_historical_elements('orders', since)
+
     # recent orders in reverse chronological order
     def get_recent_orders(self):
         return self.get_historical_orders(None)
+    
+    # historical executions after a certain point in reverse chronological order
+    def get_historical_executions(self, since=None):
+        return self._get_historical_elements('executions', since)
+
+    # recent executions in reverse chronological order
+    def get_recent_executions(self):
+        return self.get_historical_executions(None)
 
     # signs a message
     def sign_message(self, endpoint, postData, nonce=""):

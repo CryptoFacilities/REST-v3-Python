@@ -177,6 +177,16 @@ def APITester():
     result = cfPrivate.get_recent_orders()
     print("get_recent_orders:\n", "%s elements" % len(result))
 
+    # get historical executions since start of the year
+    since = datetime.datetime(2021, 1, 1).timestamp()
+    since = int(since) * 1000
+    result = cfPrivate.get_historical_executions(since=since)
+    print("get_historical_executions:\n", "%s elements" % len(result))
+
+    # get recent executions
+    result = cfPrivate.get_recent_executions()
+    print("get_recent_executions:\n", "%s elements" % len(result))
+
     # send xbt withdrawal request
     targetAddress = "xxxxxxxxxx"
     currency = "xbt"
