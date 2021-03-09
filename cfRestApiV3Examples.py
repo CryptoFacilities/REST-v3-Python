@@ -167,10 +167,15 @@ def APITester():
     result = cfPrivate.get_openpositions()
     print("get_openpositions:\n", result)
 
-    # get recentorders
-    symbol = "pi_xbtusd"
-    result = cfPrivate.get_recentorders(symbol)
-    print("get_recentorders:\n", result)
+    # get historical orders since start of the year
+    since = datetime.datetime(2021, 1, 1).timestamp()
+    since = int(since) * 1000
+    result = cfPrivate.get_historical_orders(since=since)
+    print("get_historical_orders:\n", "%s elements" % len(result))
+
+    # get recent orders
+    result = cfPrivate.get_recent_orders()
+    print("get_recent_orders:\n", "%s elements" % len(result))
 
     # send xbt withdrawal request
     targetAddress = "xxxxxxxxxx"

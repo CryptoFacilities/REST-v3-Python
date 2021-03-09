@@ -159,15 +159,6 @@ class cfApiMethods(object):
         endpoint = "/derivatives/api/v3/openpositions"
         return self.make_request("GET", endpoint)
 
-    # return the user recent orders
-    def get_recentorders(self, symbol=""):
-        endpoint = "/derivatives/api/v3/recentorders"
-        if symbol != "":
-            postUrl = "symbol=%s" % symbol
-        else:
-            postUrl = ""
-        return self.make_request("GET", endpoint, postUrl=postUrl)
-
     # sends an xbt withdrawal request
     def send_withdrawal(self, targetAddress, currency, amount):
         endpoint = "/derivatives/api/v3/withdrawal"
@@ -201,6 +192,42 @@ class cfApiMethods(object):
         endpoint = "/api/history/v2/accountlogcsv"
         return self.make_request("GET", endpoint)
 
+    def _get_partial_historical_orders(self, since=None, contToken=None):
+        endpoint = "/api/history/v2/orders"
+
+        if contToken is not None:
+            return self.make_request_raw("GET", endpoint, postUrl="continuationToken=%s" % contToken)
+        else:
+            if since is not None:
+                return self.make_request_raw("GET", endpoint, postUrl="since=%s" % since)
+
+        return self.make_request_raw("GET", endpoint)
+
+    # historical orders after a certain point in reverse chronological order
+    def get_historical_orders(self, since=None):
+        elements = []
+
+        more = True
+        contToken = None
+
+        while more:
+            res = self._get_partial_historical_orders(since, contToken)
+            body = json.loads(res.read().decode('utf-8'))
+            elements = elements + body['elements']
+
+            if res.headers['is-truncated'] is None or res.headers['is-truncated'] == "false":
+                more = False
+                contToken = None
+            else:
+                contToken = res.headers['next-continuation-token']
+
+        elements.sort(key=lambda el: el['timestamp'], reverse=True)
+        return elements
+
+    # recent orders in reverse chronological order
+    def get_recent_orders(self):
+        return self.get_historical_orders(None)
+
     # signs a message
     def sign_message(self, endpoint, postData, nonce=""):
         if endpoint.startswith('/derivatives'):
@@ -231,7 +258,7 @@ class cfApiMethods(object):
         return str(int(time.time() * 1000)) + str(self.nonce).zfill(4)
 
     # sends an HTTP request
-    def make_request(self, requestType, endpoint, postUrl="", postBody=""):
+    def make_request_raw(self, requestType, endpoint, postUrl="", postBody=""):
         # create authentication headers
         postData = postUrl + postBody
 
@@ -248,7 +275,11 @@ class cfApiMethods(object):
         authentHeaders["User-Agent"] = "cf-api-python/1.0"
 
         # create request
-        url = self.apiPath + endpoint + "?" + postUrl
+        if postUrl != "":
+            url = self.apiPath + endpoint + "?" + postUrl
+        else:
+            url = self.apiPath + endpoint
+
         request = urllib2.Request(url, str.encode(postBody), authentHeaders)
         request.get_method = lambda: requestType
 
@@ -262,7 +293,9 @@ class cfApiMethods(object):
             response = urllib2.urlopen(
                 request, context=ctx, timeout=self.timeout)
 
-        response = response.read().decode("utf-8")
-
         # return
         return response
+
+    # sends an HTTP request and read response body
+    def make_request(self, requestType, endpoint, postUrl="", postBody=""):
+        return self.make_request_raw(requestType, endpoint, postUrl, postBody).read().decode("utf-8")
