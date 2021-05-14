@@ -28,7 +28,7 @@ apiPublicKey = "..."
 apiPrivateKey = "..."
 
 # use "api.cryptofacilities.com" if your IP is whitelisted (Settings -> API Keys -> IP Whitelist)
-apiPath = "https://www.cryptofacilities.com"
+apiPath = "https://futures.kraken.com"
 timeout = 20
 checkCertificate = True  # when using the test environment, this must be set to "False"
 useNonce = False  # nonce is optional
