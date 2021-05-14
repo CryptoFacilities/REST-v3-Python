@@ -276,9 +276,9 @@ class cfApiMethods(object):
         if self.useNonce:
             nonce = self.get_nonce()
             signature = self.sign_message(endpoint, postData, nonce=nonce)
-            authentHeaders = {"APIKey": self.apiPublicKey,
-                              "Nonce": nonce, "Authent": signature}
-        else:
+            authentHeaders = {"apiKey": self.apiPublicKey,
+                              "nonce": nonce, "authent": signature}
+        else
             signature = self.sign_message(endpoint, postData)
             authentHeaders = {
                 "APIKey": self.apiPublicKey, "Authent": signature}
