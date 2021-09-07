@@ -192,52 +192,103 @@ class cfApiMethods(object):
         endpoint = "/api/history/v2/accountlogcsv"
         return self.make_request("GET", endpoint)
 
-    def _get_partial_historical_elements(self, elementType, since=None, contToken=None):
+    def _get_partial_historical_elements(self, elementType, **params):
         endpoint = "/api/history/v2/%s" % elementType
 
-        if contToken is not None:
-            return self.make_request_raw("GET", endpoint, postUrl="continuationToken=%s" % contToken)
-        else:
-            if since is not None:
-                return self.make_request_raw("GET", endpoint, postUrl="since=%s" % since)
+        params = {k: v for k, v in params.items() if v is not None}
+        postUrl = urllib.urlencode(params)
 
-        return self.make_request_raw("GET", endpoint)
+        return self.make_request_raw("GET", endpoint, postUrl)
 
-    def _get_historical_elements(self, elementType, since=None):
+    def _get_historical_elements(self, elementType, since=None, before=None, sort=None, limit=1000):
         elements = []
 
-        more = True
-        contToken = None
+        continuationToken = None
 
-        while more:
-            res = self._get_partial_historical_elements(elementType, since, contToken)
+        while True:
+            res = self._get_partial_historical_elements(elementType, since = since, before = before, sort = sort, continuationToken = continuationToken)
             body = json.loads(res.read().decode('utf-8'))
             elements = elements + body['elements']
 
             if res.headers['is-truncated'] is None or res.headers['is-truncated'] == "false":
-                more = False
-                contToken = None
+                continuationToken = None
+                break
             else:
-                contToken = res.headers['next-continuation-token']
+                continuationToken = res.headers['next-continuation-token']
 
-        elements.sort(key=lambda el: el['timestamp'], reverse=True)
+            if len(elements) >= limit:
+                elements = elements[:limit]
+                break
+
         return elements
 
-    # historical orders after a certain point in reverse chronological order
-    def get_historical_orders(self, since=None):
-        return self._get_historical_elements('orders', since)
+    def get_orders(self, since=None, before=None, sort=None, limit=1000):
+        """
+        Retrieves orders of your account. With default parameters it gets the 1000 newest orders.
 
-    # recent orders in reverse chronological order
-    def get_recent_orders(self):
-        return self.get_historical_orders(None)
-    
-    # historical executions after a certain point in reverse chronological order
-    def get_historical_executions(self, since=None):
-        return self._get_historical_elements('executions', since)
+        :param since: Timestamp in milliseconds. Retrieves orders starting at this time rather than the newest/latest.
+        :param before: Timestamp in milliseconds. Retrieves orders before this time.
+        :param sort: String "asc" or "desc". The sorting of orders.
+        :param limit: Amount of orders to be retrieved.
+        :return: List of orders
+        """
 
-    # recent executions in reverse chronological order
-    def get_recent_executions(self):
-        return self.get_historical_executions(None)
+        return self._get_historical_elements('orders', since, before, sort, limit)
+
+    def get_executions(self, since=None, before=None, sort=None, limit=1000):
+        """
+        Retrieves executions of your account. With default parameters it gets the 1000 newest executions.
+
+        :param since: Timestamp in milliseconds. Retrieves executions starting at this time rather than the newest/latest.
+        :param before: Timestamp in milliseconds. Retrieves executions before this time.
+        :param sort: String "asc" or "desc". The sorting of executions.
+        :param limit: Amount of executions to be retrieved.
+        :return: List of executions
+        """
+
+        return self._get_historical_elements('executions', since, before, sort, limit)
+
+    def get_market_price(self, symbol, since=None, before=None, sort=None, limit=1000):
+        """
+        Retrieves prices of given symbol. With default parameters it gets the 1000 newest prices.
+
+        :param symbol: Name of a symbol. For example "PI_XBTUSD".
+        :param since: Timestamp in milliseconds. Retrieves prices starting at this time rather than the newest/latest.
+        :param before: Timestamp in milliseconds. Retrieves prices before this time.
+        :param sort: String "asc" or "desc". The sorting of prices.
+        :param limit: Amount of prices to be retrieved.
+        :return: List of prices
+        """
+
+        return self._get_historical_elements('market/' + symbol + '/price', since, before, sort, limit)
+
+    def get_market_orders(self, symbol, since=None, before=None, sort=None, limit=1000):
+        """
+        Retrieves orders of given symbol. With default parameters it gets the 1000 newest orders.
+
+        :param symbol: Name of a symbol. For example "PI_XBTUSD".
+        :param since: Timestamp in milliseconds. Retrieves orders starting at this time rather than the newest/latest.
+        :param before: Timestamp in milliseconds. Retrieves orders before this time.
+        :param sort: String "asc" or "desc". The sorting of orders.
+        :param limit: Amount of orders to be retrieved.
+        :return: List of orders
+        """
+
+        return self._get_historical_elements('market/' + symbol + '/orders', since, before, sort, limit)
+
+    def get_market_executions(self, symbol, since=None, before=None, sort=None, limit=1000):
+        """
+        Retrieves executions of given symbol. With default parameters it gets the 1000 newest executions.
+
+        :param symbol: Name of a symbol. For example "PI_XBTUSD".
+        :param since: Timestamp in milliseconds. Retrieves executions starting at this time rather than the newest/latest.
+        :param before: Timestamp in milliseconds. Retrieves executions before this time.
+        :param sort: String "asc" or "desc". The sorting of executions.
+        :param limit: Amount of executions to be retrieved.
+        :return: List of executions
+        """
+
+        return self._get_historical_elements('market/' + symbol + '/executions', since, before, sort, limit)
 
     # signs a message
     def sign_message(self, endpoint, postData, nonce=""):

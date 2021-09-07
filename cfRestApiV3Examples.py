@@ -62,6 +62,10 @@ def APITester():
     result = cfPublic.get_history(symbol, lastTime=lastTime)
     print("get_history:\n", result)
 
+    # get prices
+    result = cfPublic.get_market_price(symbol)
+    print("get_market_price:\n", "%s elements" % len(result))
+
     ##### private endpoints #####
 
     # get account
@@ -170,12 +174,22 @@ def APITester():
     # get historical orders since start of the year
     since = datetime.datetime(2021, 1, 1).timestamp()
     since = int(since) * 1000
-    result = cfPrivate.get_historical_orders(since=since)
-    print("get_historical_orders:\n", "%s elements" % len(result))
+    result = cfPrivate.get_orders(since=since, sort="asc", limit=10000)
+    print("get_orders(since=%d, sort=\"asc\", limit=10000):\n" % since, "%s elements" % len(result))
 
     # get recent orders
-    result = cfPrivate.get_recent_orders()
-    print("get_recent_orders:\n", "%s elements" % len(result))
+    result = cfPrivate.get_orders()
+    print("get_orders:\n", "%s elements" % len(result))
+
+    # get historical executions since start of the year
+    since = datetime.datetime(2021, 1, 1).timestamp()
+    since = int(since) * 1000
+    result = cfPrivate.get_executions(since=since, sort="asc", limit=10000)
+    print("get_executions(since=%d, sort=\"asc\", limit=10000):\n" % since, "%s elements" % len(result))
+
+    # get recent executions
+    result = cfPrivate.get_executions()
+    print("get_executions:\n", "%s elements" % len(result))
 
     # get historical executions since start of the year
     since = datetime.datetime(2021, 1, 1).timestamp()
